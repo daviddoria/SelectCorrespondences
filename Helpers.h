@@ -43,7 +43,7 @@ void RemoveAllActors(std::vector<T*>& actors, vtkRenderer* renderer);
 void ITKImagetoVTKImage(FloatVectorImageType::Pointer image, vtkImageData* outputImage); // This function simply drives ITKImagetoVTKRGBImage or ITKImagetoVTKMagnitudeImage
 void ITKImagetoVTKRGBImage(FloatVectorImageType::Pointer image, vtkImageData* outputImage);
 void ITKImagetoVTKMagnitudeImage(FloatVectorImageType::Pointer image, vtkImageData* outputImage);
-float ComputeAverageSpacing(vtkPoints* points);
+float ComputeAverageSpacing(vtkPoints* points, unsigned int numberOfPointsToUse);
 
 template<typename TImage>
 void DeepCopyScalarImage(typename TImage::Pointer input, typename TImage::Pointer output)

@@ -296,11 +296,14 @@ void Form::LoadImage(Pane* inputPane)
     Helpers::ITKImagetoVTKMagnitudeImage(pane->Image, pane->ImageData);
     }
 
-  pane->ImageActor->SetInput(pane->ImageData);
-  pane->ImageActor->InterpolateOff();
-
+  //pane->ImageActor->SetInput(pane->ImageData);
+  //pane->ImageActor->InterpolateOff();
+  pane->ImageResliceMapper->SetInputConnection(pane->ImageData->GetProducerPort());
+  pane->ImageSlice->SetMapper(pane->ImageResliceMapper);
+  
   // Add Actor to renderer
-  pane->Renderer->AddActor(pane->ImageActor);
+  //pane->Renderer->AddActor(pane->ImageActor);
+  pane->Renderer->AddActor(pane->ImageSlice);
   pane->Renderer->ResetCamera();
 
   vtkSmartPointer<vtkPointPicker> pointPicker = vtkSmartPointer<vtkPointPicker>::New();
@@ -392,7 +395,9 @@ void Form::LoadPointCloud(Pane* inputPane)
 
   pane->Renderer->ResetCamera();
 
-  float averageSpacing = Helpers::ComputeAverageSpacing(reader->GetOutput()->GetPoints());
+  //std::cout << "Computing average spacing..." << std::endl;
+  float averageSpacing = Helpers::ComputeAverageSpacing(reader->GetOutput()->GetPoints(), 100000);
+  //std::cout << "Done computing average spacing." << std::endl;
   static_cast<PointSelectionStyle3D*>(pane->SelectionStyle)->SetMarkerRadius(averageSpacing);
 }
 

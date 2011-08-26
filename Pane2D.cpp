@@ -5,8 +5,11 @@
 
 Pane2D::Pane2D(QVTKWidget* qvtkWidget) : Pane(qvtkWidget)
 {
-  this->ImageActor = vtkSmartPointer<vtkImageActor>::New();
+  //this->ImageActor = vtkSmartPointer<vtkImageActor>::New();
   this->ImageData = vtkSmartPointer<vtkImageData>::New();
 
+  ImageResliceMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
+  
+  ImageSlice = vtkSmartPointer<vtkImageSlice>::New();
   
 }

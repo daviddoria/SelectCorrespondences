@@ -130,14 +130,29 @@ void ITKImagetoVTKMagnitudeImage(FloatVectorImageType::Pointer image, vtkImageDa
     }
 }
 
-float ComputeAverageSpacing(vtkPoints* points)
+float ComputeAverageSpacing(vtkPoints* points, unsigned int numberOfPointsToUse)
 {
+  // Compute the average spacing between pairs of closest points in the data.
+  // If 'numberOfPointsToUse' is anything positive, only the first 'numberOfPointsToUse'
+  // in the data set will be used in the computation. This is an option because often
+  // in very large datasets (~1M points) a small sample is enough to determine the average
+  // spacing relatively accurately.
+  
+  if(numberOfPointsToUse == 0)
+    {
+    numberOfPointsToUse = points->GetNumberOfPoints();
+    }
+  if(numberOfPointsToUse > static_cast<unsigned int>(points->GetNumberOfPoints()))
+    {
+    numberOfPointsToUse = points->GetNumberOfPoints();
+    }
+
   float sumOfDistances = 0.;
   //Create the tree
   vtkSmartPointer<vtkKdTree> pointTree = vtkSmartPointer<vtkKdTree>::New();
   pointTree->BuildLocatorFromPoints(points);
- 
-  for(vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i)
+
+  for(vtkIdType i = 0; i < static_cast<vtkIdType>(numberOfPointsToUse); ++i)
     {
     // Get the coordinates of the current point
     double queryPoint[3];
