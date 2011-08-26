@@ -262,12 +262,10 @@ void Form::SavePoints3D(Pane3D* pane, const std::string& filename)
   fout.close();
 }
 
-void Form::Load(Pane* pane)
+void Form::LoadImage(Pane* inputPane)
 {
-  // Open an image or point cloud in the left pane.
-
-  // Get a filename to open
-  QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Image Files (*.png *.mha *.vtp)");
+    // Get a filename to open
+  QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Image Files (*.jpg *.jpeg *.bmp *.png *.mha)");
 
   std::cout << "Got filename: " << fileName.toStdString() << std::endl;
   if(fileName.toStdString().empty())
@@ -275,36 +273,18 @@ void Form::Load(Pane* pane)
     std::cout << "Filename was empty." << std::endl;
     return;
     }
-
+/*
   QFileInfo fileInfo(fileName.toStdString().c_str());
   std::string extension = fileInfo.suffix().toStdString();
-  std::cout << "extension: " << extension << std::endl;
-
-  if(extension.compare("png") == 0 || extension.compare("mha") == 0)
-    {
-    LoadImage(pane, fileName.toStdString());
-    }
-  else if(extension.compare("vtp") == 0)
-    {
-    LoadPointCloud(pane, fileName.toStdString());
-    }
-  else
-    {
-    std::cerr << "The extension " << extension << " is not known!" << std::endl;
-    return;
-    }
-}
-
-void Form::LoadImage(Pane* inputPane, const std::string& filename)
-{
+  std::cout << "extension: " << extension << std::endl;*/
+  
   Pane2D* pane = static_cast<Pane2D*>(inputPane);
 
   typedef itk::ImageFileReader<FloatVectorImageType> ReaderType;
   ReaderType::Pointer reader = ReaderType::New();
-  reader->SetFileName(filename);
+  reader->SetFileName(fileName.toStdString());
   reader->Update();
 
-  //static_cast<Pane2D*>(pane)->Image = reader->GetOutput();
   pane->Image = reader->GetOutput();
 
   if(this->chkRGB->isChecked())
@@ -326,7 +306,6 @@ void Form::LoadImage(Pane* inputPane, const std::string& filename)
   vtkSmartPointer<vtkPointPicker> pointPicker = vtkSmartPointer<vtkPointPicker>::New();
   pane->qvtkWidget->GetRenderWindow()->GetInteractor()->SetPicker(pointPicker);
   pane->SelectionStyle = PointSelectionStyle2D::New();
-  //this->LeftPointSelectionStyle->SetCurrentRenderer(this->LeftRenderer);
   pane->SelectionStyle->SetCurrentRenderer(pane->Renderer);
   pane->qvtkWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(static_cast<PointSelectionStyle2D*>(pane->SelectionStyle));
 
@@ -359,12 +338,26 @@ void Form::LoadImage(Pane* inputPane, const std::string& filename)
   pane->qvtkWidget->GetRenderWindow()->Render();
 }
 
-void Form::LoadPointCloud(Pane* inputPane, const std::string& filename)
+void Form::LoadPointCloud(Pane* inputPane)
 {
+  // Get a filename to open
+  QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Point Clouds (*.vtp)");
+
+  std::cout << "Got filename: " << fileName.toStdString() << std::endl;
+  if(fileName.toStdString().empty())
+    {
+    std::cout << "Filename was empty." << std::endl;
+    return;
+    }
+/*
+  QFileInfo fileInfo(fileName.toStdString().c_str());
+  std::string extension = fileInfo.suffix().toStdString();
+  std::cout << "extension: " << extension << std::endl;
+  */
   Pane3D* pane = static_cast<Pane3D*>(inputPane);
 
   vtkSmartPointer<vtkXMLPolyDataReader> reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
-  reader->SetFileName(filename.c_str());
+  reader->SetFileName(fileName.toStdString().c_str());
   reader->Update();
   reader->GetOutput()->GetPointData()->SetActiveScalars("Intensity");
 
@@ -420,7 +413,7 @@ void Form::on_actionOpenImageLeft_activated()
     delete this->LeftPane;
     }
   this->LeftPane = new Pane2D(this->qvtkWidgetLeft);
-  Load(this->LeftPane);
+  LoadImage(this->LeftPane);
 }
 
 void Form::on_actionOpenImageRight_activated()
@@ -430,7 +423,7 @@ void Form::on_actionOpenImageRight_activated()
     delete this->RightPane;
     }
   this->RightPane = new Pane2D(this->qvtkWidgetRight);
-  Load(this->RightPane);
+  LoadImage(this->RightPane);
 }
 
 
@@ -441,7 +434,7 @@ void Form::on_actionOpenPointCloudLeft_activated()
     delete this->LeftPane;
     }
   this->LeftPane = new Pane3D(this->qvtkWidgetLeft);
-  Load(this->LeftPane);
+  LoadPointCloud(this->LeftPane);
 }
 
 void Form::on_actionOpenPointCloudRight_activated()
@@ -451,7 +444,7 @@ void Form::on_actionOpenPointCloudRight_activated()
     delete this->RightPane;
     }
   this->RightPane = new Pane3D(this->qvtkWidgetRight);
-  Load(this->RightPane);
+  LoadPointCloud(this->RightPane);
 }
 
 void Form::on_actionSavePointsLeft_activated()

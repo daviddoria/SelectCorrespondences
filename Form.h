@@ -86,9 +86,8 @@ protected:
   void SavePoints2D(Pane2D* pane, const std::string& filename);
   void SavePoints3D(Pane3D* pane, const std::string& filename);
   
-  void Load(Pane* pane);
-  void LoadImage(Pane* pane, const std::string& filename);
-  void LoadPointCloud(Pane* pane, const std::string& filename);
+  void LoadImage(Pane* pane);
+  void LoadPointCloud(Pane* pane);
   
   Pane* LeftPane;
   Pane* RightPane;
