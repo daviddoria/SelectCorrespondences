@@ -43,7 +43,6 @@ vtkStandardNewMacro(PointSelectionStyle3D);
 
 PointSelectionStyle3D::PointSelectionStyle3D()
 {
-  
   this->MarkerRadius = .05;
   
   // Create a sphere to use as the dot
@@ -52,8 +51,6 @@ PointSelectionStyle3D::PointSelectionStyle3D()
   this->DotSource->Update();
   
 }
-
-
 
 void PointSelectionStyle3D::OnLeftButtonDown() 
 {
@@ -98,19 +95,7 @@ void PointSelectionStyle3D::OnLeftButtonDown()
   vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
 
 }
-/*
-void PointSelectionStyle3D::RemoveAllPoints()
-{
-  for(unsigned int i = 0; i < Coordinates.size(); ++i)
-    {
-    this->CurrentRenderer->RemoveViewProp( Numbers[i]);
-    this->CurrentRenderer->RemoveViewProp( Points[i]);
-    }
-  Numbers.clear();
-  Points.clear();
-  Coordinates.clear();
-}
-*/
+
 void PointSelectionStyle3D::AddNumber(double p[3])
 {
   // Create the text
@@ -141,13 +126,6 @@ void PointSelectionStyle3D::AddNumber(double p[3])
 
   this->Numbers.push_back(follower);
   this->CurrentRenderer->AddViewProp( follower );
-  
-  /*
-  // Create a blank follower just for testing
-  vtkSmartPointer<vtkFollower> follower = vtkSmartPointer<vtkFollower>::New();
-  this->Numbers.push_back(follower);
-  this->CurrentRenderer->AddViewProp( follower );
-  */
   
   // Create the dot
 

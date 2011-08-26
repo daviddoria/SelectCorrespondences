@@ -34,6 +34,8 @@
 
 // Custom
 #include "Pane.h"
+#include "Pane2D.h"
+#include "Pane3D.h"
 #include "PointSelectionStyle.h"
 #include "Types.h"
 
@@ -77,7 +79,13 @@ public slots:
 protected:
 
   void LoadPoints(Pane* pane);
+  void LoadPoints2D(Pane2D* pane, const std::string& filename);
+  void LoadPoints3D(Pane3D* pane, const std::string& filename);
+
   void SavePoints(Pane* pane);
+  void SavePoints2D(Pane2D* pane, const std::string& filename);
+  void SavePoints3D(Pane3D* pane, const std::string& filename);
+  
   void Load(Pane* pane);
   void LoadImage(Pane* pane, const std::string& filename);
   void LoadPointCloud(Pane* pane, const std::string& filename);

@@ -12,6 +12,7 @@ class vtkRenderer;
 struct Pane
 {
   Pane(QVTKWidget* qvtkWidget);
+  virtual ~Pane();
   
   vtkSmartPointer<vtkRenderer> Renderer;
 
@@ -20,6 +21,8 @@ struct Pane
   QVTKWidget* qvtkWidget;
 
   void Refresh();
+
+  
 };
 
 #endif

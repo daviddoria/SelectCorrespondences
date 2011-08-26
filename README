@@ -1,1 +1,1 @@
-Functionality just like Matlab's cpselect, but using ITK/VTK. This allows a user to select corresponding points in two images which are then used as landmarks for registration.
+Functionality just like Matlab's cpselect, but using ITK/VTK. This allows a user to select corresponding points in two data sets (images or point clouds) which can then be used for a variety of applications.

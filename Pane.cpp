@@ -13,6 +13,11 @@ Pane::Pane(QVTKWidget* inputQVTKWidget)
   this->qvtkWidget->GetRenderWindow()->AddRenderer(this->Renderer);
 }
 
+Pane::~Pane()
+{
+
+}
+
 void Pane::Refresh()
 {
   this->qvtkWidget->GetRenderWindow()->Render();

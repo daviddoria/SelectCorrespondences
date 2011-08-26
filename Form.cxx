@@ -125,6 +125,10 @@ Form::Form()
 
   actionLoadPointsRight->setIcon(openIcon);
   this->toolBar_right->addAction(actionLoadPointsRight);
+
+  // Initialize
+  this->LeftPane = NULL;
+  this->RightPane = NULL;
 };
 
 void Form::LoadPoints(Pane* pane)
@@ -147,15 +151,28 @@ void Form::LoadPoints(Pane* pane)
     return;
     }
 
+  if(dynamic_cast<Pane2D*>(pane))
+    {
+    LoadPoints2D(dynamic_cast<Pane2D*>(pane), fileName.toStdString());
+    }
+  else if(dynamic_cast<Pane3D*>(pane))
+    {
+    LoadPoints3D(dynamic_cast<Pane3D*>(pane), fileName.toStdString());
+    }
+}
+
+
+void Form::LoadPoints2D(Pane2D* pane, const std::string& filename)
+{
   std::string line;
-  std::ifstream fin(fileName.toStdString().c_str());
+  std::ifstream fin(filename.c_str());
 
   if(fin == NULL)
     {
     std::cout << "Cannot open file." << std::endl;
     }
 
-  static_cast<PointSelectionStyle2D*>(this->LeftPane->SelectionStyle)->RemoveAll();
+  pane->SelectionStyle->RemoveAll();
 
   while(getline(fin, line))
     {
@@ -165,24 +182,40 @@ void Form::LoadPoints(Pane* pane)
     ss >> p[0] >> p[1];
     p[2] = 0;
 
-    LeftPane->SelectionStyle->AddNumber(p);
+    pane->SelectionStyle->AddNumber(p);
+    }
+}
+
+void Form::LoadPoints3D(Pane3D* pane, const std::string& filename)
+{
+  std::string line;
+  std::ifstream fin(filename.c_str());
+
+  if(fin == NULL)
+    {
+    std::cout << "Cannot open file." << std::endl;
+    }
+
+  pane->SelectionStyle->RemoveAll();
+
+  while(getline(fin, line))
+    {
+    std::stringstream ss;
+    ss << line;
+    double p[3];
+    ss >> p[0] >> p[1] >> p[2];
+
+    pane->SelectionStyle->AddNumber(p);
     }
 }
 
 void Form::SavePoints(Pane* pane)
 {
-  if(!pane->SelectionStyle || !pane->SelectionStyle)
+  if(!pane)
     {
-    std::cerr << "You must have loaded and selected points from both the image and the corresponding point cloud!" << std::endl;
+    std::cerr << "You must have loaded and selected points from this pane!" << std::endl;
     return;
     }
-
-  if(pane->SelectionStyle->GetNumberOfCorrespondences() !=
-     pane->SelectionStyle->GetNumberOfCorrespondences())
-  {
-    std::cerr << "The number of image correspondences must match the number of point cloud correspondences!" << std::endl;
-    return;
-  }
 
   QString fileName = QFileDialog::getSaveFileName(this, "Save File", ".", "Text Files (*.txt)");
   std::cout << "Got filename: " << fileName.toStdString() << std::endl;
@@ -192,12 +225,39 @@ void Form::SavePoints(Pane* pane)
     return;
     }
 
-  std::ofstream fout(fileName.toStdString().c_str());
+  if(dynamic_cast<Pane2D*>(pane))
+    {
+    SavePoints2D(dynamic_cast<Pane2D*>(pane), fileName.toStdString());
+    }
+  else if(dynamic_cast<Pane3D*>(pane))
+    {
+    SavePoints3D(dynamic_cast<Pane3D*>(pane), fileName.toStdString());
+    }
+  
+}
+
+void Form::SavePoints2D(Pane2D* pane, const std::string& filename)
+{
+  std::ofstream fout(filename.c_str());
 
   for(unsigned int i = 0; i < pane->SelectionStyle->GetNumberOfCorrespondences(); i++)
     {
-    fout << pane->SelectionStyle->GetCorrespondence(i).x << " " << pane->SelectionStyle->GetCorrespondence(i).y << std::endl;
+    fout << pane->SelectionStyle->GetCorrespondence(i).x << " "
+         << pane->SelectionStyle->GetCorrespondence(i).y << std::endl;
 
+    }
+  fout.close();
+}
+
+void Form::SavePoints3D(Pane3D* pane, const std::string& filename)
+{
+  std::ofstream fout(filename.c_str());
+
+  for(unsigned int i = 0; i < pane->SelectionStyle->GetNumberOfCorrespondences(); i++)
+    {
+    fout << pane->SelectionStyle->GetCorrespondence(i).x << " "
+         << pane->SelectionStyle->GetCorrespondence(i).y << " "
+         << pane->SelectionStyle->GetCorrespondence(i).z << std::endl;
     }
   fout.close();
 }
@@ -355,12 +415,20 @@ void Form::on_actionLoadPointsRight_activated()
 
 void Form::on_actionOpenImageLeft_activated()
 {
+  if(this->LeftPane)
+    {
+    delete this->LeftPane;
+    }
   this->LeftPane = new Pane2D(this->qvtkWidgetLeft);
   Load(this->LeftPane);
 }
 
 void Form::on_actionOpenImageRight_activated()
 {
+  if(this->RightPane)
+    {
+    delete this->RightPane;
+    }
   this->RightPane = new Pane2D(this->qvtkWidgetRight);
   Load(this->RightPane);
 }
@@ -368,12 +436,20 @@ void Form::on_actionOpenImageRight_activated()
 
 void Form::on_actionOpenPointCloudLeft_activated()
 {
+  if(this->LeftPane)
+    {
+    delete this->LeftPane;
+    }
   this->LeftPane = new Pane3D(this->qvtkWidgetLeft);
   Load(this->LeftPane);
 }
 
 void Form::on_actionOpenPointCloudRight_activated()
 {
+  if(this->RightPane)
+    {
+    delete this->RightPane;
+    }
   this->RightPane = new Pane3D(this->qvtkWidgetRight);
   Load(this->RightPane);
 }
