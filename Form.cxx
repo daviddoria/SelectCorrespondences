@@ -55,6 +55,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
+#include <vtkImageSliceMapper.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkXMLPolyDataReader.h>
 
@@ -296,10 +297,8 @@ void Form::LoadImage(Pane* inputPane)
     Helpers::ITKImagetoVTKMagnitudeImage(pane->Image, pane->ImageData);
     }
 
-  //pane->ImageActor->SetInput(pane->ImageData);
-  //pane->ImageActor->InterpolateOff();
-  pane->ImageResliceMapper->SetInputConnection(pane->ImageData->GetProducerPort());
-  pane->ImageSlice->SetMapper(pane->ImageResliceMapper);
+  pane->ImageSliceMapper->SetInputConnection(pane->ImageData->GetProducerPort());
+  pane->ImageSlice->SetMapper(pane->ImageSliceMapper);
   
   // Add Actor to renderer
   //pane->Renderer->AddActor(pane->ImageActor);
@@ -314,31 +313,31 @@ void Form::LoadImage(Pane* inputPane)
 
   pane->Renderer->ResetCamera();
 
-  // Flip the image by changing the camera view up because of the conflicting conventions used by ITK and VTK
-  //this->LeftRenderer = vtkSmartPointer<vtkRenderer>::New();
-  //this->LeftRenderer->GradientBackgroundOn();
-  //this->LeftRenderer->SetBackground(this->BackgroundColor);
-  //this->LeftRenderer->SetBackground2(1,1,1);
-
-  double cameraUp[3];
-  cameraUp[0] = 0;
-  cameraUp[1] = -1;
-  cameraUp[2] = 0;
-  pane->Renderer->GetActiveCamera()->SetViewUp(cameraUp);
-
-  double cameraPosition[3];
-  pane->Renderer->GetActiveCamera()->GetPosition(cameraPosition);
-  //std::cout << cameraPosition[0] << " " << cameraPosition[1] << " " << cameraPosition[2] << std::endl;
-  //cameraPosition[0] *= -1;
-  //cameraPosition[1] *= -1;
-  cameraPosition[2] *= -1;
-  pane->Renderer->GetActiveCamera()->SetPosition(cameraPosition);
-
-  // Verify
-  pane->Renderer->GetActiveCamera()->GetPosition(cameraPosition);
-  //std::cout << cameraPosition[0] << " " << cameraPosition[1] << " " << cameraPosition[2] << std::endl;
-
   pane->qvtkWidget->GetRenderWindow()->Render();
+}
+
+void Form::on_actionFlipLeftImage_activated()
+{
+  if(dynamic_cast<Pane2D*>(this->LeftPane))
+    {
+    static_cast<Pane2D*>(this->LeftPane)->Flip();
+    }
+  else
+    {
+    std::cerr << "Cannot flip a point cloud!" << std::endl;
+    }
+}
+
+void Form::on_actionFlipRightImage_activated()
+{
+  if(dynamic_cast<Pane2D*>(this->RightPane))
+    {
+    static_cast<Pane2D*>(this->RightPane)->Flip();
+    }
+  else
+    {
+    std::cerr << "Cannot flip a point cloud!" << std::endl;
+    }
 }
 
 void Form::LoadPointCloud(Pane* inputPane)

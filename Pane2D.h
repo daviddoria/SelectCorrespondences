@@ -5,21 +5,25 @@
 
 #include "Types.h"
 
-class vtkImageActor;
-
-#include <vtkImageResliceMapper.h>
-#include <vtkImageSlice.h>
+class vtkImageSliceMapper;
+class vtkImageSlice;
 
 struct Pane2D : public Pane
 {
   Pane2D(QVTKWidget* qvtkWidget);
   
   FloatVectorImageType::Pointer Image;
-  //vtkSmartPointer<vtkImageActor> ImageActor;
   vtkSmartPointer<vtkImageData> ImageData;
   
-  vtkSmartPointer<vtkImageResliceMapper> ImageResliceMapper;
+  vtkSmartPointer<vtkImageSliceMapper> ImageSliceMapper;
   vtkSmartPointer<vtkImageSlice> ImageSlice;
+  
+  bool Flipped;
+  void SetCameraPosition1();
+  void SetCameraPosition2();
+  
+  void Flip();
+
 };
 
 #endif

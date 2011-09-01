@@ -50,10 +50,10 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QVTKWidget" name="qvtkWidgetLeft"/>
+           <widget class="QVTKWidget" name="qvtkWidgetLeft" native="true"/>
           </item>
           <item>
-           <widget class="QVTKWidget" name="qvtkWidgetRight"/>
+           <widget class="QVTKWidget" name="qvtkWidgetRight" native="true"/>
           </item>
          </layout>
         </item>
@@ -144,8 +144,16 @@
     <addaction name="actionSavePointsRight"/>
     <addaction name="actionLoadPointsRight"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionFlipLeftImage"/>
+    <addaction name="actionFlipRightImage"/>
+   </widget>
    <addaction name="menuLeft_Pane"/>
    <addaction name="menuRight_Pane"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -219,6 +227,16 @@
   <action name="actionOpenPointCloudRight">
    <property name="text">
     <string>Open PointCloud</string>
+   </property>
+  </action>
+  <action name="actionFlipLeftImage">
+   <property name="text">
+    <string>Flip Left Image</string>
+   </property>
+  </action>
+  <action name="actionFlipRightImage">
+   <property name="text">
+    <string>Flip Right Image</string>
    </property>
   </action>
  </widget>

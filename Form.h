@@ -76,6 +76,9 @@ public slots:
   void on_btnDeleteLastCorrespondenceRight_clicked();
   void on_btnDeleteAllCorrespondencesRight_clicked();
   
+  void on_actionFlipLeftImage_activated();
+  void on_actionFlipRightImage_activated();
+  
 protected:
 
   void LoadPoints(Pane* pane);
