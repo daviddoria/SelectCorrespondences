@@ -61,13 +61,6 @@
       </item>
      </layout>
     </item>
-    <item row="6" column="0">
-     <widget class="QCheckBox" name="chkFlipImage">
-      <property name="text">
-       <string>Flip Image</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0">
       <item>
@@ -127,6 +120,7 @@
     <addaction name="actionOpenPointCloudLeft"/>
     <addaction name="actionSavePointsLeft"/>
     <addaction name="actionLoadPointsLeft"/>
+    <addaction name="actionFlipLeftImage"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -143,17 +137,10 @@
     <addaction name="actionOpenPointCloudRight"/>
     <addaction name="actionSavePointsRight"/>
     <addaction name="actionLoadPointsRight"/>
-   </widget>
-   <widget class="QMenu" name="menuEdit">
-    <property name="title">
-     <string>Edit</string>
-    </property>
-    <addaction name="actionFlipLeftImage"/>
     <addaction name="actionFlipRightImage"/>
    </widget>
    <addaction name="menuLeft_Pane"/>
    <addaction name="menuRight_Pane"/>
-   <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
