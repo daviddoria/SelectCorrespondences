@@ -21,7 +21,7 @@
 
 // Superclass
 #include "PointSelectionStyle.h"
-#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkInteractorStyleTrackballActor.h>
 
 // VTK
 #include <vtkSmartPointer.h>
@@ -34,29 +34,29 @@
 #include "Coord.h"
 
 // Define interaction style
-class PointSelectionStyle3D : public vtkInteractorStyleTrackballCamera, public PointSelectionStyle
+class PointSelectionStyle3D : public vtkInteractorStyleTrackballActor, public PointSelectionStyle
 {
-  public:
-    static PointSelectionStyle3D* New();
-    PointSelectionStyle3D();
-    vtkTypeMacro(PointSelectionStyle3D, vtkInteractorStyleTrackballCamera);
- 
-    void OnLeftButtonDown() ;
- 
-    vtkSmartPointer<vtkSphereSource> DotSource;
-    
-    void AddNumber(double p[3]);
+public:
+  static PointSelectionStyle3D* New();
+  PointSelectionStyle3D();
+  vtkTypeMacro(PointSelectionStyle3D, vtkInteractorStyleTrackballActor);
 
-    void RemoveAll();
-    void DeleteLastCorrespondence();
+  void OnLeftButtonDown() ;
 
-    vtkPolyData* Data;
-
-    void SetCurrentRenderer(vtkRenderer*);
-    
-  private:
-    
+  vtkSmartPointer<vtkSphereSource> DotSource;
   
+  void AddNumber(double p[3]);
+
+  void RemoveAll();
+  void DeleteLastCorrespondence();
+
+  vtkPolyData* Data;
+
+  void SetCurrentRenderer(vtkRenderer*);
+  
+private:
+  
+
 };
 
 #endif

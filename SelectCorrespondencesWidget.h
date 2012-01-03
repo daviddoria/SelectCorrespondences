@@ -16,10 +16,10 @@
  *
  *=========================================================================*/
 
-#ifndef FORM_H
-#define FORM_H
+#ifndef SelectCorrespondencesWidget_H
+#define SelectCorrespondencesWidget_H
 
-#include "ui_Form.h"
+#include "ui_SelectCorrespondencesWidget.h"
 
 // VTK
 #include <vtkSmartPointer.h>
@@ -31,6 +31,8 @@
 
 // Qt
 #include <QMainWindow>
+#include <QFutureWatcher>
+class QProgressDialog;
 
 // Custom
 #include "Pane.h"
@@ -48,21 +50,21 @@ class vtkPolyData;
 class vtkPolyDataMapper;
 class vtkRenderer;
 
-class Form : public QMainWindow, public Ui::Form
+class SelectCorrespondencesWidget : public QMainWindow, public Ui::SelectCorrespondencesWidget
 {
   Q_OBJECT
 public:
 
   // Constructor/Destructor
-  Form();
-  ~Form() {};
+  SelectCorrespondencesWidget();
+  ~SelectCorrespondencesWidget() {};
 
 public slots:
   void on_actionOpenImageLeft_activated();
   void on_actionOpenPointCloudLeft_activated();
   void on_actionSavePointsLeft_activated();
   void on_actionLoadPointsLeft_activated();
-  
+
   void on_actionOpenImageRight_activated();
   void on_actionOpenPointCloudRight_activated();
   void on_actionSavePointsRight_activated();
@@ -76,25 +78,30 @@ public slots:
   void on_btnDeleteLastCorrespondenceRight_clicked();
   void on_btnDeleteAllCorrespondencesRight_clicked();
   
-  void on_actionFlipLeftImage_activated();
-  void on_actionFlipRightImage_activated();
+  void on_actionFlipLeftHorizontally_activated();
+  void on_actionFlipLeftVertically_activated();
+  void on_actionFlipRightHorizontally_activated();
+  void on_actionFlipRightVertically_activated();
   
-protected:
+private:
 
-  void LoadPoints(Pane* pane);
-  void LoadPoints2D(Pane2D* pane, const std::string& filename);
-  void LoadPoints3D(Pane3D* pane, const std::string& filename);
+  QFutureWatcher<void> FutureWatcher;
+  QProgressDialog* ProgressDialog;
 
-  void SavePoints(Pane* pane);
-  void SavePoints2D(Pane2D* pane, const std::string& filename);
-  void SavePoints3D(Pane3D* pane, const std::string& filename);
+  void LoadPoints(Pane* const pane);
+  void LoadPoints2D(Pane2D* const pane, const std::string& filename);
+  void LoadPoints3D(Pane3D* const pane, const std::string& filename);
+
+  void SavePoints(Pane* const pane);
+  void SavePoints2D(Pane2D* const pane, const std::string& filename);
+  void SavePoints3D(Pane3D* const pane, const std::string& filename);
   
-  void LoadImage(Pane* pane);
-  void LoadPointCloud(Pane* pane);
+  void LoadImage(Pane* const pane);
+  void LoadPointCloud(Pane* const pane);
   
   Pane* LeftPane;
   Pane* RightPane;
   
 };
 
-#endif // Form_H
+#endif

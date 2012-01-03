@@ -5,12 +5,12 @@ unsigned int PointSelectionStyle::GetNumberOfCorrespondences()
   return this->Numbers.size();
 }
 
-Coord3D PointSelectionStyle::GetCorrespondence(unsigned int i)
+Coord3D PointSelectionStyle::GetCorrespondence(const unsigned int correspondenceId)
 {
-  return this->Coordinates[i];
+  return this->Coordinates[correspondenceId];
 }
 
-void PointSelectionStyle::SetMarkerRadius(float radius)
+void PointSelectionStyle::SetMarkerRadius(const float radius)
 {
   this->MarkerRadius = radius;
   //this->DotSource->SetRadius(this->MarkerRadius);

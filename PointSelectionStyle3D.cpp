@@ -57,9 +57,9 @@ void PointSelectionStyle3D::OnLeftButtonDown()
   //std::cout << "Picking pixel: " << this->Interactor->GetEventPosition()[0] << " " << this->Interactor->GetEventPosition()[1] << std::endl;
   //int success = vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->Pick(this->Interactor->GetEventPosition()[0],
   vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->Pick(this->Interactor->GetEventPosition()[0],
-	  this->Interactor->GetEventPosition()[1],
-	  0,  // always zero.
-	  this->CurrentRenderer);
+          this->Interactor->GetEventPosition()[1],
+          0,  // always zero.
+          this->CurrentRenderer);
   //std::cout << "Success? " << success << std::endl;
 
   if(vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->GetDataSet() != this->Data)
@@ -79,7 +79,6 @@ void PointSelectionStyle3D::OnLeftButtonDown()
   vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->GetPickPosition(picked);
   //std::cout << "Picked point with coordinate: " << picked[0] << " " << picked[1] << " " << picked[2] << std::endl;
 
-  
   if(this->Interactor->GetShiftKey())
     {
     this->CurrentRenderer->GetActiveCamera()->SetFocalPoint(picked);
@@ -92,8 +91,7 @@ void PointSelectionStyle3D::OnLeftButtonDown()
     }
 
   // Forward events
-  vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
-
+  vtkInteractorStyleTrackballActor::OnLeftButtonDown();
 }
 
 void PointSelectionStyle3D::AddNumber(double p[3])

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QMainWindow" name="Form">
+ <class>SelectCorrespondencesWidget</class>
+ <widget class="QMainWindow" name="SelectCorrespondencesWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -50,10 +50,10 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QVTKWidget" name="qvtkWidgetLeft" native="true"/>
+           <widget class="QVTKWidget" name="qvtkWidgetLeft"/>
           </item>
           <item>
-           <widget class="QVTKWidget" name="qvtkWidgetRight" native="true"/>
+           <widget class="QVTKWidget" name="qvtkWidgetRight"/>
           </item>
          </layout>
         </item>
@@ -109,19 +109,21 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuLeft_Pane">
     <property name="title">
      <string>Left Pane</string>
     </property>
-    <addaction name="actionOpenImageLeft"/>
     <addaction name="actionOpenPointCloudLeft"/>
     <addaction name="actionSavePointsLeft"/>
     <addaction name="actionLoadPointsLeft"/>
-    <addaction name="actionFlipLeftImage"/>
-    <addaction name="actionQuit"/>
+    <addaction name="separator"/>
+    <addaction name="actionOpenImageLeft"/>
+    <addaction name="actionFlipLeftVertically"/>
+    <addaction name="actionFlipLeftHorizontally"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -133,12 +135,21 @@
     <property name="title">
      <string>Right Pane</string>
     </property>
-    <addaction name="actionOpenImageRight"/>
     <addaction name="actionOpenPointCloudRight"/>
     <addaction name="actionSavePointsRight"/>
     <addaction name="actionLoadPointsRight"/>
-    <addaction name="actionFlipRightImage"/>
+    <addaction name="separator"/>
+    <addaction name="actionOpenImageRight"/>
+    <addaction name="actionFlipRightVertically"/>
+    <addaction name="actionFlipRightHorizontally"/>
    </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionQuit"/>
+   </widget>
+   <addaction name="menuFile"/>
    <addaction name="menuLeft_Pane"/>
    <addaction name="menuRight_Pane"/>
    <addaction name="menuHelp"/>
@@ -216,14 +227,24 @@
     <string>Open PointCloud</string>
    </property>
   </action>
-  <action name="actionFlipLeftImage">
+  <action name="actionFlipLeftHorizontally">
    <property name="text">
-    <string>Flip Left Image</string>
+    <string>Flip Horizontally</string>
    </property>
   </action>
-  <action name="actionFlipRightImage">
+  <action name="actionFlipRightVertically">
    <property name="text">
-    <string>Flip Right Image</string>
+    <string>Flip Vertically</string>
+   </property>
+  </action>
+  <action name="actionFlipLeftVertically">
+   <property name="text">
+    <string>Flip Vertically</string>
+   </property>
+  </action>
+  <action name="actionFlipRightHorizontally">
+   <property name="text">
+    <string>Flip Horizontally</string>
    </property>
   </action>
  </widget>

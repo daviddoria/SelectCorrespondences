@@ -32,18 +32,18 @@
 // Define interaction style
 class PointSelectionStyle2D : public vtkInteractorStyleImage, public PointSelectionStyle
 {
-  public:
-    static PointSelectionStyle2D* New();
-    vtkTypeMacro(PointSelectionStyle2D, vtkInteractorStyleImage);
-    
-    void OnLeftButtonDown();
- 
-    void AddNumber(double p[3]);
+public:
+  static PointSelectionStyle2D* New();
+  vtkTypeMacro(PointSelectionStyle2D, vtkInteractorStyleImage);
+  
+  void OnLeftButtonDown();
 
-    void RemoveAll();
-    void DeleteLastCorrespondence();
-    
-    void SetCurrentRenderer(vtkRenderer*);
+  void AddNumber(double p[3]);
+
+  void RemoveAll();
+  void DeleteLastCorrespondence();
+  
+  void SetCurrentRenderer(vtkRenderer*);
 };
 
 #endif

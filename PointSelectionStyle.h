@@ -45,12 +45,12 @@ class PointSelectionStyle
 
     virtual void SetCurrentRenderer(vtkRenderer*) = 0;
 
-    void SetMarkerRadius(float radius);
+    void SetMarkerRadius(const float radius);
 
     unsigned int GetNumberOfCorrespondences();
 
-    Coord3D GetCorrespondence(unsigned int i);
-    
+    Coord3D GetCorrespondence(const unsigned int correspondenceId);
+
   protected:
     std::vector<vtkProp*> Numbers;
     std::vector<vtkActor*> Points;

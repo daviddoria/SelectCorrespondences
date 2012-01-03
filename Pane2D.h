@@ -17,13 +17,14 @@ struct Pane2D : public Pane
   
   vtkSmartPointer<vtkImageSliceMapper> ImageSliceMapper;
   vtkSmartPointer<vtkImageSlice> ImageSlice;
-  
-  bool Flipped;
-  void SetCameraPosition1();
-  void SetCameraPosition2();
-  
-  void Flip();
 
+  void FlipVertically();
+  void FlipHorizontally();
+
+private:
+  std::vector<float> CameraLeftToRightVector;
+  std::vector<float> CameraBottomToTopVector;
+  void SetCameraPosition();
 };
 
 #endif

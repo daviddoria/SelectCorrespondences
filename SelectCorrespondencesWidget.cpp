@@ -17,7 +17,7 @@
  *=========================================================================*/
 
 #include "ui_Form.h"
-#include "Form.h"
+#include "SelectCorrespondencesWidget.h"
 
 // ITK
 #include "itkCastImageFilter.h"
@@ -29,7 +29,9 @@
 // Qt
 #include <QFileDialog>
 #include <QIcon>
+#include <QProgressDialog>
 #include <QTextEdit>
+#include <QtConcurrentRun>
 
 // VTK
 #include <vtkActor.h>
@@ -68,7 +70,7 @@
 #include "Pane2D.h"
 #include "Pane3D.h"
 
-void Form::on_actionHelp_activated()
+void SelectCorrespondencesWidget::on_actionHelp_activated()
 {
   QTextEdit* help=new QTextEdit();
   
@@ -87,15 +89,17 @@ void Form::on_actionHelp_activated()
   help->show();
 }
 
-void Form::on_actionQuit_activated()
+void SelectCorrespondencesWidget::on_actionQuit_activated()
 {
   exit(0);
 }
 
 // Constructor
-Form::Form()
+SelectCorrespondencesWidget::SelectCorrespondencesWidget() : LeftPane(NULL), RightPane(NULL), ProgressDialog(new QProgressDialog())
 {
   this->setupUi(this);
+
+  connect(&this->FutureWatcher, SIGNAL(finished()), this->ProgressDialog , SLOT(cancel()));
 
   // Setup icons
   QIcon openIcon = QIcon::fromTheme("document-open");
@@ -127,12 +131,9 @@ Form::Form()
   actionLoadPointsRight->setIcon(openIcon);
   this->toolBar_right->addAction(actionLoadPointsRight);
 
-  // Initialize
-  this->LeftPane = NULL;
-  this->RightPane = NULL;
 };
 
-void Form::LoadPoints(Pane* pane)
+void SelectCorrespondencesWidget::LoadPoints(Pane* const pane)
 {
   // This function reads existing correspondences from a plain text file and displays them in the left pane.
 
@@ -163,7 +164,7 @@ void Form::LoadPoints(Pane* pane)
 }
 
 
-void Form::LoadPoints2D(Pane2D* pane, const std::string& filename)
+void SelectCorrespondencesWidget::LoadPoints2D(Pane2D* const pane, const std::string& filename)
 {
   std::string line;
   std::ifstream fin(filename.c_str());
@@ -187,7 +188,7 @@ void Form::LoadPoints2D(Pane2D* pane, const std::string& filename)
     }
 }
 
-void Form::LoadPoints3D(Pane3D* pane, const std::string& filename)
+void SelectCorrespondencesWidget::LoadPoints3D(Pane3D* const pane, const std::string& filename)
 {
   std::string line;
   std::ifstream fin(filename.c_str());
@@ -210,7 +211,7 @@ void Form::LoadPoints3D(Pane3D* pane, const std::string& filename)
     }
 }
 
-void Form::SavePoints(Pane* pane)
+void SelectCorrespondencesWidget::SavePoints(Pane* const pane)
 {
   if(!pane)
     {
@@ -237,7 +238,7 @@ void Form::SavePoints(Pane* pane)
   
 }
 
-void Form::SavePoints2D(Pane2D* pane, const std::string& filename)
+void SelectCorrespondencesWidget::SavePoints2D(Pane2D* const pane, const std::string& filename)
 {
   std::ofstream fout(filename.c_str());
 
@@ -250,7 +251,7 @@ void Form::SavePoints2D(Pane2D* pane, const std::string& filename)
   fout.close();
 }
 
-void Form::SavePoints3D(Pane3D* pane, const std::string& filename)
+void SelectCorrespondencesWidget::SavePoints3D(Pane3D* const pane, const std::string& filename)
 {
   std::ofstream fout(filename.c_str());
 
@@ -263,7 +264,7 @@ void Form::SavePoints3D(Pane3D* pane, const std::string& filename)
   fout.close();
 }
 
-void Form::LoadImage(Pane* inputPane)
+void SelectCorrespondencesWidget::LoadImage(Pane* const inputPane)
 {
     // Get a filename to open
   QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Image Files (*.jpg *.jpeg *.bmp *.png *.mha)");
@@ -316,11 +317,11 @@ void Form::LoadImage(Pane* inputPane)
   pane->qvtkWidget->GetRenderWindow()->Render();
 }
 
-void Form::on_actionFlipLeftImage_activated()
+void SelectCorrespondencesWidget::on_actionFlipLeftHorizontally_activated()
 {
   if(dynamic_cast<Pane2D*>(this->LeftPane))
     {
-    static_cast<Pane2D*>(this->LeftPane)->Flip();
+    static_cast<Pane2D*>(this->LeftPane)->FlipHorizontally();
     }
   else
     {
@@ -328,11 +329,23 @@ void Form::on_actionFlipLeftImage_activated()
     }
 }
 
-void Form::on_actionFlipRightImage_activated()
+void SelectCorrespondencesWidget::on_actionFlipLeftVertically_activated()
+{
+  if(dynamic_cast<Pane2D*>(this->LeftPane))
+    {
+    static_cast<Pane2D*>(this->LeftPane)->FlipVertically();
+    }
+  else
+    {
+    std::cerr << "Cannot flip a point cloud!" << std::endl;
+    }
+}
+
+void SelectCorrespondencesWidget::on_actionFlipRightHorizontally_activated()
 {
   if(dynamic_cast<Pane2D*>(this->RightPane))
     {
-    static_cast<Pane2D*>(this->RightPane)->Flip();
+    static_cast<Pane2D*>(this->RightPane)->FlipHorizontally();
     }
   else
     {
@@ -340,7 +353,19 @@ void Form::on_actionFlipRightImage_activated()
     }
 }
 
-void Form::LoadPointCloud(Pane* inputPane)
+void SelectCorrespondencesWidget::on_actionFlipRightVertically_activated()
+{
+  if(dynamic_cast<Pane2D*>(this->RightPane))
+    {
+    static_cast<Pane2D*>(this->RightPane)->FlipVertically();
+    }
+  else
+    {
+    std::cerr << "Cannot flip a point cloud!" << std::endl;
+    }
+}
+
+void SelectCorrespondencesWidget::LoadPointCloud(Pane* const inputPane)
 {
   // Get a filename to open
   QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Point Clouds (*.vtp)");
@@ -360,7 +385,17 @@ void Form::LoadPointCloud(Pane* inputPane)
 
   vtkSmartPointer<vtkXMLPolyDataReader> reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   reader->SetFileName(fileName.toStdString().c_str());
-  reader->Update();
+
+  //reader->Update();
+  // Start the computation.
+  QFuture<void> future = QtConcurrent::run(reader.GetPointer(), static_cast<void(vtkXMLPolyDataReader::*)()>(&vtkXMLPolyDataReader::Update));
+  this->FutureWatcher.setFuture(future);
+  this->ProgressDialog->setMinimum(0);
+  this->ProgressDialog->setMaximum(0);
+  this->ProgressDialog->setLabelText("Opening file...");
+  this->ProgressDialog->setWindowModality(Qt::WindowModal);
+  this->ProgressDialog->exec();
+  
   reader->GetOutput()->GetPointData()->SetActiveScalars("Intensity");
 
   float range[2];
@@ -394,23 +429,23 @@ void Form::LoadPointCloud(Pane* inputPane)
 
   pane->Renderer->ResetCamera();
 
-  //std::cout << "Computing average spacing..." << std::endl;
+  std::cout << "Computing average spacing..." << std::endl;
   float averageSpacing = Helpers::ComputeAverageSpacing(reader->GetOutput()->GetPoints(), 100000);
-  //std::cout << "Done computing average spacing." << std::endl;
+  std::cout << "Done computing average spacing." << std::endl;
   static_cast<PointSelectionStyle3D*>(pane->SelectionStyle)->SetMarkerRadius(averageSpacing);
 }
 
-void Form::on_actionLoadPointsLeft_activated()
+void SelectCorrespondencesWidget::on_actionLoadPointsLeft_activated()
 {
   LoadPoints(this->LeftPane);
 }
 
-void Form::on_actionLoadPointsRight_activated()
+void SelectCorrespondencesWidget::on_actionLoadPointsRight_activated()
 {
   LoadPoints(this->RightPane);
 }
 
-void Form::on_actionOpenImageLeft_activated()
+void SelectCorrespondencesWidget::on_actionOpenImageLeft_activated()
 {
   if(this->LeftPane)
     {
@@ -420,7 +455,7 @@ void Form::on_actionOpenImageLeft_activated()
   LoadImage(this->LeftPane);
 }
 
-void Form::on_actionOpenImageRight_activated()
+void SelectCorrespondencesWidget::on_actionOpenImageRight_activated()
 {
   if(this->RightPane)
     {
@@ -431,7 +466,7 @@ void Form::on_actionOpenImageRight_activated()
 }
 
 
-void Form::on_actionOpenPointCloudLeft_activated()
+void SelectCorrespondencesWidget::on_actionOpenPointCloudLeft_activated()
 {
   if(this->LeftPane)
     {
@@ -441,7 +476,7 @@ void Form::on_actionOpenPointCloudLeft_activated()
   LoadPointCloud(this->LeftPane);
 }
 
-void Form::on_actionOpenPointCloudRight_activated()
+void SelectCorrespondencesWidget::on_actionOpenPointCloudRight_activated()
 {
   if(this->RightPane)
     {
@@ -449,25 +484,26 @@ void Form::on_actionOpenPointCloudRight_activated()
     }
   this->RightPane = new Pane3D(this->qvtkWidgetRight);
   LoadPointCloud(this->RightPane);
+  std::cout << "Done loading point cloud." << std::endl;
 }
 
-void Form::on_actionSavePointsLeft_activated()
+void SelectCorrespondencesWidget::on_actionSavePointsLeft_activated()
 {
   SavePoints(this->LeftPane);
 }
 
-void Form::on_actionSavePointsRight_activated()
+void SelectCorrespondencesWidget::on_actionSavePointsRight_activated()
 {
   SavePoints(this->RightPane);
 }
 
-void Form::on_btnDeleteLastCorrespondenceLeft_clicked()
+void SelectCorrespondencesWidget::on_btnDeleteLastCorrespondenceLeft_clicked()
 {
   this->LeftPane->SelectionStyle->DeleteLastCorrespondence();
   this->LeftPane->Refresh();
 }
 
-void Form::on_btnDeleteAllCorrespondencesLeft_clicked()
+void SelectCorrespondencesWidget::on_btnDeleteAllCorrespondencesLeft_clicked()
 {
   this->LeftPane->SelectionStyle->RemoveAll();
   this->LeftPane->Refresh();
@@ -475,13 +511,13 @@ void Form::on_btnDeleteAllCorrespondencesLeft_clicked()
   //this->qvtkWidgetLeft->GetRenderWindow()->Render();
 }
 
-void Form::on_btnDeleteLastCorrespondenceRight_clicked()
+void SelectCorrespondencesWidget::on_btnDeleteLastCorrespondenceRight_clicked()
 {
   this->RightPane->SelectionStyle->DeleteLastCorrespondence();
   this->RightPane->Refresh();
 }
 
-void Form::on_btnDeleteAllCorrespondencesRight_clicked()
+void SelectCorrespondencesWidget::on_btnDeleteAllCorrespondencesRight_clicked()
 {
   this->RightPane->SelectionStyle->RemoveAll();
   this->RightPane->Refresh();

@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 PROJECT(SelectCorrespondences)
 
@@ -14,12 +13,12 @@ INCLUDE(${QT_USE_FILE})
 FIND_PACKAGE(ITK REQUIRED)
 INCLUDE(${ITK_USE_FILE})
 
-QT4_WRAP_UI(UISrcs Form.ui)
-QT4_WRAP_CPP(MOCSrcs Form.h)
+QT4_WRAP_UI(UISrcs SelectCorrespondencesWidget.ui)
+QT4_WRAP_CPP(MOCSrcs SelectCorrespondencesWidget.h)
 
 ADD_EXECUTABLE(SelectCorrespondences
 SelectCorrespondences.cpp
-Form.cxx 
+SelectCorrespondencesWidget.cpp
 Helpers.cpp
 Pane.cpp
 Pane2D.cpp
@@ -28,5 +27,4 @@ PointSelectionStyle.cpp
 PointSelectionStyle2D.cpp
 PointSelectionStyle3D.cpp
 ${UISrcs} ${MOCSrcs} ${ResourceSrcs})
-TARGET_LINK_LIBRARIES(SelectCorrespondences QVTK ${VTK_LIBRARIES}
-${ITK_LIBRARIES})
+TARGET_LINK_LIBRARIES(SelectCorrespondences QVTK ${VTK_LIBRARIES} ${ITK_LIBRARIES})
