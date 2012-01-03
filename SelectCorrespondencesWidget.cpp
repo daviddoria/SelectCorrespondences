@@ -171,7 +171,7 @@ void SelectCorrespondencesWidget::LoadPoints2D(Pane2D* const pane, const std::st
 
   if(fin == NULL)
     {
-    std::cout << "Cannot open file." << std::endl;
+    throw std::runtime_error("LoadPoints2D Cannot open file.");
     }
 
   pane->SelectionStyle->RemoveAll();
@@ -195,7 +195,7 @@ void SelectCorrespondencesWidget::LoadPoints3D(Pane3D* const pane, const std::st
 
   if(fin == NULL)
     {
-    std::cout << "Cannot open file." << std::endl;
+    throw std::runtime_error("LoadPoints3D Cannot open file.");
     }
 
   pane->SelectionStyle->RemoveAll();
@@ -431,8 +431,8 @@ void SelectCorrespondencesWidget::LoadPointCloud(Pane* const inputPane)
 
   std::cout << "Computing average spacing..." << std::endl;
   float averageSpacing = Helpers::ComputeAverageSpacing(reader->GetOutput()->GetPoints(), 100000);
-  std::cout << "Done computing average spacing." << std::endl;
-  static_cast<PointSelectionStyle3D*>(pane->SelectionStyle)->SetMarkerRadius(averageSpacing);
+  std::cout << "Done computing average spacing: " << averageSpacing << std::endl;
+  static_cast<PointSelectionStyle3D*>(pane->SelectionStyle)->SetMarkerRadius(averageSpacing * 10.0);
 }
 
 void SelectCorrespondencesWidget::on_actionLoadPointsLeft_activated()

@@ -64,7 +64,7 @@ void PointSelectionStyle3D::OnLeftButtonDown()
 
   if(vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->GetDataSet() != this->Data)
     {
-    std::cerr << "Did not pick from the correct data set!" << std::endl;
+    throw std::runtime_error("Did not pick from the correct data set!");
     }
   /*
   vtkIdType pointId = vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->GetPointId();
@@ -91,7 +91,8 @@ void PointSelectionStyle3D::OnLeftButtonDown()
     }
 
   // Forward events
-  vtkInteractorStyleTrackballActor::OnLeftButtonDown();
+  vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
+
 }
 
 void PointSelectionStyle3D::AddNumber(double p[3])

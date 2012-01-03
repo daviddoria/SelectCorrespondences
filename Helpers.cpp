@@ -53,8 +53,9 @@ void ITKImagetoVTKRGBImage(FloatVectorImageType::Pointer image, vtkImageData* ou
   //std::cout << "ITKImagetoVTKRGBImage()" << std::endl;
   if(image->GetNumberOfComponentsPerPixel() < 3)
     {
-    std::cerr << "The input image has " << image->GetNumberOfComponentsPerPixel() << " components, but at least 3 are required." << std::endl;
-    return;
+    std::stringstream ss;
+    ss << "The input image has " << image->GetNumberOfComponentsPerPixel() << " components, but at least 3 are required.";
+    throw std::runtime_error(ss.str());
     }
 
   // Setup and allocate the image data
