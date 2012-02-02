@@ -16,7 +16,7 @@
  *
  *=========================================================================*/
 
-#include "ui_Form.h"
+#include "ui_SelectCorrespondencesWidget.h"
 #include "SelectCorrespondencesWidget.h"
 
 // ITK
