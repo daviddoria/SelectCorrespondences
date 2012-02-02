@@ -7,6 +7,10 @@ PROJECT(SelectCorrespondences)
 FIND_PACKAGE(VTK REQUIRED)
 INCLUDE(${VTK_USE_FILE})
 
+if(${VTK_MAJOR_VERSION} LESS 5 OR ${VTK_MINOR_VERSION} LESS 8)
+  message(FATAL_ERROR "Your VTK version (${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}) is too old! At least 5.8 is required.")
+endif()
+
 FIND_PACKAGE(Qt4 REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
