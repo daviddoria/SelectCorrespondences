@@ -42,6 +42,7 @@
 #include <vtkFloatArray.h>
 #include <vtkImageActor.h>
 #include <vtkImageData.h>
+#include <vtkImageSlice.h>
 #include <vtkInteractorStyleImage.h>
 #include <vtkLookupTable.h>
 #include <vtkMath.h>
