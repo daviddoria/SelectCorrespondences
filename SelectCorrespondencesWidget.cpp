@@ -396,18 +396,24 @@ void SelectCorrespondencesWidget::LoadPointCloud(Pane* const inputPane)
   this->ProgressDialog->setLabelText("Opening file...");
   this->ProgressDialog->setWindowModality(Qt::WindowModal);
   this->ProgressDialog->exec();
-  
-  reader->GetOutput()->GetPointData()->SetActiveScalars("Intensity");
-
-  float range[2];
-  vtkFloatArray::SafeDownCast(reader->GetOutput()->GetPointData()->GetArray("Intensity"))->GetValueRange(range);
 
   vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
   //lookupTable->SetTableRange(0.0, 10.0);
-  lookupTable->SetTableRange(range[0], range[1]);
   //lookupTable->SetHueRange(0, .5);
   //lookupTable->SetHueRange(.5, 1);
   lookupTable->SetHueRange(0, 1);
+
+  // If the cloud has an "Intensity" array, use it for the initial coloring
+  vtkFloatArray* intensityArray = vtkFloatArray::SafeDownCast(reader->GetOutput()->GetPointData()->GetArray("Intensity"));
+  if(intensityArray)
+    {
+    reader->GetOutput()->GetPointData()->SetActiveScalars("Intensity");
+
+    float range[2];
+    intensityArray->GetValueRange(range);
+
+    lookupTable->SetTableRange(range[0], range[1]);
+    }
 
   pane->PointCloudMapper->SetInputConnection(reader->GetOutputPort());
   pane->PointCloudMapper->SetLookupTable(lookupTable);
