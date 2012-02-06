@@ -55,15 +55,27 @@ PointSelectionStyle3D::PointSelectionStyle3D()
 void PointSelectionStyle3D::OnLeftButtonDown() 
 {
   //std::cout << "Picking pixel: " << this->Interactor->GetEventPosition()[0] << " " << this->Interactor->GetEventPosition()[1] << std::endl;
-  //int success = vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->Pick(this->Interactor->GetEventPosition()[0],
-  vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->Pick(this->Interactor->GetEventPosition()[0],
+  int success = vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->Pick(this->Interactor->GetEventPosition()[0],
+  //vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->Pick(this->Interactor->GetEventPosition()[0],
           this->Interactor->GetEventPosition()[1],
           0,  // always zero.
           this->CurrentRenderer);
-  //std::cout << "Success? " << success << std::endl;
-
-  if(vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->GetDataSet() != this->Data)
+  if(!success)
     {
+    // Forward events
+    vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
+    return;
+    }
+
+  vtkPointPicker* pointPicker = vtkPointPicker::SafeDownCast(this->Interactor->GetPicker());
+  if(!pointPicker)
+    {
+    throw std::runtime_error("pointPicker is invalid!");
+    }
+
+  if(pointPicker->GetDataSet() != this->Data)
+    {
+    std::cerr << "pointPicker->GetDataSet(): " << pointPicker->GetDataSet() << " this->Data: " << this->Data << std::endl;
     throw std::runtime_error("Did not pick from the correct data set!");
     }
   /*
@@ -76,7 +88,7 @@ void PointSelectionStyle3D::OnLeftButtonDown()
   */
   double picked[3] = {0,0,0};
   
-  vtkPointPicker::SafeDownCast(this->Interactor->GetPicker())->GetPickPosition(picked);
+  pointPicker->GetPickPosition(picked);
   //std::cout << "Picked point with coordinate: " << picked[0] << " " << picked[1] << " " << picked[2] << std::endl;
 
   if(this->Interactor->GetShiftKey())
