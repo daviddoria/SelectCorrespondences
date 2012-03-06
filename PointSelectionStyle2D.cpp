@@ -101,6 +101,8 @@ void PointSelectionStyle2D::AddNumber(double p[3])
   captionActor->SetCaption( ss.str().c_str() );
   captionActor->SetAttachmentPoint(p);
   captionActor->BorderOff();
+  //captionActor->SetPadding(10);
+  captionActor->GetCaptionTextProperty()->SetFontFamilyToTimes();
   captionActor->GetCaptionTextProperty()->BoldOff();
   captionActor->GetCaptionTextProperty()->ItalicOff();
   captionActor->GetCaptionTextProperty()->ShadowOff();

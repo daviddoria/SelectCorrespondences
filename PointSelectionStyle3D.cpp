@@ -35,6 +35,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
+#include <vtkTextProperty.h>
 #include <vtkVectorText.h>
 
 // STL
@@ -50,25 +51,29 @@ PointSelectionStyle3D::PointSelectionStyle3D()
 {
   this->MarkerRadius = .05;
 
-  SelectedPoints = vtkSmartPointer<vtkPoints>::New();
-  SelectedPointsPolyData = vtkSmartPointer<vtkPolyData>::New();
-  SelectedPointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  SelectedPointsMapper->SetInputConnection(SelectedPointsPolyData->GetProducerPort());
-  SelectedPointsActor = vtkSmartPointer<vtkActor>::New();
-  SelectedPointsActor->SetMapper(SelectedPointsMapper);
-  
   // Create a sphere to use as the dot
   this->DotSource = vtkSmartPointer<vtkSphereSource>::New();
   this->DotSource->SetRadius(this->MarkerRadius);
   this->DotSource->Update();
 
+  SelectedPoints = vtkSmartPointer<vtkPoints>::New();
+  SelectedPointsPolyData = vtkSmartPointer<vtkPolyData>::New();
+  SelectedPointsPolyData->SetPoints(SelectedPoints);
+
   Glyph3D = vtkSmartPointer<vtkGlyph3D>::New();
   Glyph3D->SetSource(DotSource->GetOutput());
-  Glyph3D->SetInput(SelectedPointsPolyData);
+  Glyph3D->SetInputConnection(SelectedPointsPolyData->GetProducerPort());
+
+  SelectedPointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  SelectedPointsMapper->SetInputConnection(Glyph3D->GetOutputPort());
+  SelectedPointsActor = vtkSmartPointer<vtkActor>::New();
+  SelectedPointsActor->SetMapper(SelectedPointsMapper);
+
 
   // Create the text numbers
   LabeledDataMapper = vtkSmartPointer<vtkLabeledDataMapper>::New();
   LabeledDataMapper->SetInputConnection(SelectedPointsPolyData->GetProducerPort());
+  LabeledDataMapper->GetLabelTextProperty()->SetFontSize(20);
   LabelActor = vtkSmartPointer<vtkActor2D>::New();
   LabelActor->SetMapper(LabeledDataMapper);
 
