@@ -33,10 +33,12 @@ int main( int argc, char** argv )
 
   if(argc == 1)
   {
+    std::cout << "Using no arguments." << std::endl;
     selectCorrespondencesWidget = new SelectCorrespondencesWidget;
   }
   else if(argc == 3)
   {
+    std::cout << "Using image/point cloud arguments." << std::endl;
     std::string imageFileName = argv[1];
     std::string pointCloudFileName = argv[2];
     std::cout << "Image: " << imageFileName << std::endl;

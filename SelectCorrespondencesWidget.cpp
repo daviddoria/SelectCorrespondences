@@ -142,6 +142,12 @@ void SelectCorrespondencesWidget::SharedConstructor()
 SelectCorrespondencesWidget::SelectCorrespondencesWidget(const std::string& imageFileName, const std::string& pointCloudFileName)
 {
   SharedConstructor();
+
+  this->LeftPane = new Pane2D(this->qvtkWidgetLeft);
+  LoadImage(LeftPane, imageFileName);
+
+  this->RightPane = new Pane3D(this->qvtkWidgetRight);
+  LoadPointCloud(RightPane, pointCloudFileName);
 }
 
 // Constructor
@@ -282,6 +288,10 @@ void SelectCorrespondencesWidget::LoadImage(Pane* const inputPane, const std::st
   
   Pane2D* pane = static_cast<Pane2D*>(inputPane);
 
+  if(!pane)
+  {
+    throw std::runtime_error("LoadImage: inputPane is NULL!");
+  }
   typedef itk::ImageFileReader<FloatVectorImageType> ReaderType;
   ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName(fileName);
@@ -310,6 +320,7 @@ void SelectCorrespondencesWidget::LoadImage(Pane* const inputPane, const std::st
   pane->qvtkWidget->GetRenderWindow()->GetInteractor()->SetPicker(pointPicker);
   pane->SelectionStyle = PointSelectionStyle2D::New();
   pane->SelectionStyle->SetCurrentRenderer(pane->Renderer);
+  //pane->SelectionStyle->Initialize();
   pane->qvtkWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(static_cast<PointSelectionStyle2D*>(pane->SelectionStyle));
 
   pane->Renderer->ResetCamera();
@@ -365,17 +376,9 @@ void SelectCorrespondencesWidget::on_actionFlipRightVertically_activated()
     }
 }
 
-void SelectCorrespondencesWidget::LoadPointCloud(Pane* const inputPane)
+void SelectCorrespondencesWidget::LoadPointCloud(Pane* const inputPane, const std::string& fileName)
 {
-  // Get a filename to open
-  QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Point Clouds (*.vtp)");
 
-  std::cout << "Got filename: " << fileName.toStdString() << std::endl;
-  if(fileName.toStdString().empty())
-    {
-    std::cout << "Filename was empty." << std::endl;
-    return;
-    }
 /*
   QFileInfo fileInfo(fileName.toStdString().c_str());
   std::string extension = fileInfo.suffix().toStdString();
@@ -383,8 +386,13 @@ void SelectCorrespondencesWidget::LoadPointCloud(Pane* const inputPane)
   */
   Pane3D* pane = static_cast<Pane3D*>(inputPane);
 
+  if(!pane)
+  {
+    throw std::runtime_error("LoadImage: inputPane is NULL!");
+  }
+  
   vtkSmartPointer<vtkXMLPolyDataReader> reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
-  reader->SetFileName(fileName.toStdString().c_str());
+  reader->SetFileName(fileName.c_str());
 
   //reader->Update();
   // Start the computation.
@@ -430,6 +438,7 @@ void SelectCorrespondencesWidget::LoadPointCloud(Pane* const inputPane)
   pane->qvtkWidget->GetRenderWindow()->GetInteractor()->SetPicker(pointPicker);
   pane->SelectionStyle = PointSelectionStyle3D::New();
   pane->SelectionStyle->SetCurrentRenderer(pane->Renderer);
+  pane->SelectionStyle->Initialize();
   static_cast<PointSelectionStyle3D*>(pane->SelectionStyle)->Data = reader->GetOutput();
   pane->qvtkWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(static_cast<PointSelectionStyle3D*>(pane->SelectionStyle));
 
@@ -438,6 +447,7 @@ void SelectCorrespondencesWidget::LoadPointCloud(Pane* const inputPane)
   std::cout << "Computing average spacing..." << std::endl;
   float averageSpacing = Helpers::ComputeAverageSpacing(reader->GetOutput()->GetPoints(), 100000);
   std::cout << "Done computing average spacing: " << averageSpacing << std::endl;
+
   static_cast<PointSelectionStyle3D*>(pane->SelectionStyle)->SetMarkerRadius(averageSpacing * 10.0);
 }
 
@@ -513,22 +523,43 @@ void SelectCorrespondencesWidget::on_actionOpenImageRight_activated()
 
 void SelectCorrespondencesWidget::on_actionOpenPointCloudLeft_activated()
 {
+  // Get a filename to open
+  QString fileName = QFileDialog::getOpenFileName(this, "Open Point Cloud", ".", "Files (*.vtp)");
+
+  std::cout << "Got filename: " << fileName.toStdString() << std::endl;
+  if(fileName.toStdString().empty())
+    {
+    std::cout << "Filename was empty." << std::endl;
+    return;
+    }
+    
   if(this->LeftPane)
     {
     delete this->LeftPane;
     }
   this->LeftPane = new Pane3D(this->qvtkWidgetLeft);
-  LoadPointCloud(this->LeftPane);
+  LoadPointCloud(this->LeftPane, fileName.toStdString());
+  std::cout << "Done loading point cloud." << std::endl;
 }
 
 void SelectCorrespondencesWidget::on_actionOpenPointCloudRight_activated()
 {
+  // Get a filename to open
+  QString fileName = QFileDialog::getOpenFileName(this, "Open Point Cloud", ".", "Files (*.vtp)");
+
+  std::cout << "Got filename: " << fileName.toStdString() << std::endl;
+  if(fileName.toStdString().empty())
+    {
+    std::cout << "Filename was empty." << std::endl;
+    return;
+    }
+    
   if(this->RightPane)
     {
     delete this->RightPane;
     }
   this->RightPane = new Pane3D(this->qvtkWidgetRight);
-  LoadPointCloud(this->RightPane);
+  LoadPointCloud(this->RightPane, fileName.toStdString());
   std::cout << "Done loading point cloud." << std::endl;
 }
 

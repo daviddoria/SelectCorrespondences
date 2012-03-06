@@ -20,6 +20,8 @@
 
 // VTK
 #include <vtkAbstractPicker.h>
+#include <vtkActor.h>
+#include <vtkActor2D.h>
 #include <vtkCamera.h>
 #include <vtkFollower.h>
 #include <vtkGlyph3D.h>
@@ -52,7 +54,9 @@ PointSelectionStyle3D::PointSelectionStyle3D()
   SelectedPointsPolyData = vtkSmartPointer<vtkPolyData>::New();
   SelectedPointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   SelectedPointsMapper->SetInputConnection(SelectedPointsPolyData->GetProducerPort());
-
+  SelectedPointsActor = vtkSmartPointer<vtkActor>::New();
+  SelectedPointsActor->SetMapper(SelectedPointsMapper);
+  
   // Create a sphere to use as the dot
   this->DotSource = vtkSmartPointer<vtkSphereSource>::New();
   this->DotSource->SetRadius(this->MarkerRadius);
@@ -64,8 +68,22 @@ PointSelectionStyle3D::PointSelectionStyle3D()
 
   // Create the text numbers
   LabeledDataMapper = vtkSmartPointer<vtkLabeledDataMapper>::New();
-  
+  LabeledDataMapper->SetInputConnection(SelectedPointsPolyData->GetProducerPort());
+  LabelActor = vtkSmartPointer<vtkActor2D>::New();
+  LabelActor->SetMapper(LabeledDataMapper);
 
+}
+
+void PointSelectionStyle3D::Initialize()
+{
+  // This function must be called after calling selectionStyle->SetCurrentRenderer(renderer);
+  if(!this->CurrentRenderer)
+  {
+    throw std::runtime_error("Initialize: CurrentRenderer is NULL!");
+  }
+  
+  this->CurrentRenderer->AddViewProp(SelectedPointsActor);
+  this->CurrentRenderer->AddViewProp(LabelActor);
 }
 
 void PointSelectionStyle3D::OnLeftButtonDown() 
@@ -137,47 +155,22 @@ void PointSelectionStyle3D::AddNumber(double p[3])
   Coordinates.push_back(coord);
 
   SelectedPoints->InsertNextPoint(p);
+  SelectedPointsPolyData->SetPoints(SelectedPoints);
+  SelectedPointsPolyData->Modified();
   
-  vtkSmartPointer<vtkVectorText> textSource = vtkSmartPointer<vtkVectorText>::New();
-  textSource->SetText( ss.str().c_str() );
-
-  // Create a mapper
-  vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  mapper->SetInputConnection( textSource->GetOutputPort() );
-
-  vtkSmartPointer<vtkLabeledDataMapper> labelMapper =
-    vtkSmartPointer<vtkLabeledDataMapper>::New();
-  labelMapper->SetInputConnection(pointSource->GetOutputPort());
-  vtkSmartPointer<vtkActor2D> labelActor =
-    vtkSmartPointer<vtkActor2D>::New();
-  labelActor->SetMapper(labelMapper);
+  std::cout << "There are " << SelectedPointsPolyData->GetNumberOfPoints() << " selected points." << std::endl;
+  for(vtkIdType i = 0; i < SelectedPointsPolyData->GetNumberOfPoints(); ++i)
+  {
+    double selectedPoint[3];
+    SelectedPointsPolyData->GetPoint(i, selectedPoint);
+    std::cout << "Selected point " << i << " : " << selectedPoint[0] << " " << selectedPoint[1] << " " << selectedPoint[2] << std::endl;
+  }
   
-  // Create a subclass of vtkActor: a vtkFollower that remains facing the camera
-//   vtkSmartPointer<vtkFollower> follower = vtkSmartPointer<vtkFollower>::New();
-//   follower->SetMapper( mapper );
-//   follower->SetCamera(this->CurrentRenderer->GetActiveCamera());
-//   follower->SetPosition(p);
-//   follower->GetProperty()->SetColor( 1, 0, 0 ); // red
-//   follower->SetScale( .1, .1, .1 );
-// 
-//   this->Numbers.push_back(follower);
-  // this->CurrentRenderer->AddViewProp( follower );
+  // Create the dots
   
-  // Create the dot
-  this->CurrentRenderer->AddViewProp(Glyph3D);
+  // Create the text
+  LabeledDataMapper->Update();
   
-  // Create a mapper
-  vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  sphereMapper->SetInputConnection( this->DotSource->GetOutputPort() );
-
-  // Create a subclass of vtkActor: a vtkFollower that remains facing the camera
-//   vtkSmartPointer<vtkActor> sphereActor = vtkSmartPointer<vtkActor>::New();
-//   sphereActor->SetMapper( sphereMapper );
-//   sphereActor->SetPosition(p);
-//   sphereActor->GetProperty()->SetColor( 1, 0, 0 ); // red
-
-  // this->Points.push_back(sphereActor);
-  this->CurrentRenderer->AddViewProp( sphereActor );
 }
 
 void PointSelectionStyle3D::RemoveAll()

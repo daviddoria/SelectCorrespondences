@@ -92,16 +92,21 @@ private:
   QFutureWatcher<void> FutureWatcher;
   QProgressDialog* ProgressDialog;
 
+  /** Load correspondences */
   void LoadPoints(Pane* const pane, const std::string& fileName);
   void LoadPoints2D(Pane2D* const pane, const std::string& filename);
   void LoadPoints3D(Pane3D* const pane, const std::string& filename);
 
+  /** Save correspondences */
   void SavePoints(Pane* const pane);
   void SavePoints2D(Pane2D* const pane, const std::string& filename);
   void SavePoints3D(Pane3D* const pane, const std::string& filename);
-  
+
+  /** Load an image*/
   void LoadImage(Pane* const pane, const std::string& fileName);
-  void LoadPointCloud(Pane* const pane);
+
+  /** Load a point cloud*/
+  void LoadPointCloud(Pane* const pane, const std::string& fileName);
   
   Pane* LeftPane;
   Pane* RightPane;

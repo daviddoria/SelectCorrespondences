@@ -51,6 +51,8 @@ class PointSelectionStyle
 
     Coord3D GetCorrespondence(const unsigned int correspondenceId);
 
+    virtual void Initialize() = 0;
+    
   protected:
     std::vector<vtkProp*> Numbers;
     std::vector<vtkActor*> Points;

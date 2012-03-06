@@ -40,6 +40,8 @@ public:
 
   void AddNumber(double p[3]);
 
+  void Initialize() {}
+  
   void RemoveAll();
   void DeleteLastCorrespondence();
   

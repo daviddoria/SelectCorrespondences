@@ -25,8 +25,11 @@
 
 // VTK
 #include <vtkSmartPointer.h>
-class vtkSphereSource;
+
+class vtkActor;
+class vtkActor2D;
 class vtkGlyph3D;
+class vtkSphereSource;
 class vtkPoints;
 class vtkPolyData;
 class vtkLabeledDataMapper;
@@ -45,18 +48,22 @@ public:
   PointSelectionStyle3D();
   vtkTypeMacro(PointSelectionStyle3D, vtkInteractorStyleTrackballCamera);
 
-  void OnLeftButtonDown() ;
+  void OnLeftButtonDown();
+
+  void Initialize();
 
   vtkSmartPointer<vtkSphereSource> DotSource;
 
   vtkSmartPointer<vtkLabeledDataMapper> LabeledDataMapper;
+  vtkSmartPointer<vtkActor2D> LabelActor;
+
   vtkSmartPointer<vtkGlyph3D> Glyph3D;
   vtkSmartPointer<vtkPolyDataMapper> SelectedPointsMapper;
+  vtkSmartPointer<vtkActor> SelectedPointsActor;
 
   vtkSmartPointer<vtkPoints> SelectedPoints;
   vtkSmartPointer<vtkPolyData> SelectedPointsPolyData;
-  
-  
+
   void AddNumber(double p[3]);
 
   void RemoveAll();
