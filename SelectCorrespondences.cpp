@@ -19,6 +19,8 @@
 #include <QApplication>
 #include <QCleanlooksStyle>
 
+#include <stdexcept>
+
 #include "SelectCorrespondencesWidget.h"
 
 int main( int argc, char** argv )
@@ -27,8 +29,25 @@ int main( int argc, char** argv )
 
   QApplication::setStyle(new QCleanlooksStyle);
 
-  SelectCorrespondencesWidget selectCorrespondencesWidget;
-  selectCorrespondencesWidget.show();
+  SelectCorrespondencesWidget* selectCorrespondencesWidget = NULL;
+
+  if(argc == 1)
+  {
+    selectCorrespondencesWidget = new SelectCorrespondencesWidget;
+  }
+  else if(argc == 3)
+  {
+    std::string imageFileName = argv[1];
+    std::string pointCloudFileName = argv[2];
+    std::cout << "Image: " << imageFileName << std::endl;
+    std::cout << "Point cloud: " << pointCloudFileName << std::endl;
+    selectCorrespondencesWidget = new SelectCorrespondencesWidget(imageFileName, pointCloudFileName);
+  }
+  else
+  {
+    throw std::runtime_error("Bad arguments!");
+  }
+  selectCorrespondencesWidget->show();
 
   return app.exec();
 }

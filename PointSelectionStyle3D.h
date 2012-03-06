@@ -25,7 +25,11 @@
 
 // VTK
 #include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
+class vtkSphereSource;
+class vtkGlyph3D;
+class vtkPoints;
+class vtkPolyData;
+class vtkLabeledDataMapper;
 
 // STL
 #include <vector>
@@ -44,6 +48,14 @@ public:
   void OnLeftButtonDown() ;
 
   vtkSmartPointer<vtkSphereSource> DotSource;
+
+  vtkSmartPointer<vtkLabeledDataMapper> LabeledDataMapper;
+  vtkSmartPointer<vtkGlyph3D> Glyph3D;
+  vtkSmartPointer<vtkPolyDataMapper> SelectedPointsMapper;
+
+  vtkSmartPointer<vtkPoints> SelectedPoints;
+  vtkSmartPointer<vtkPolyData> SelectedPointsPolyData;
+  
   
   void AddNumber(double p[3]);
 

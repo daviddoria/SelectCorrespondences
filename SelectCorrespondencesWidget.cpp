@@ -19,6 +19,9 @@
 #include "ui_SelectCorrespondencesWidget.h"
 #include "SelectCorrespondencesWidget.h"
 
+// STL
+#include <stdexcept>
+
 // ITK
 #include "itkCastImageFilter.h"
 #include "itkImageFileReader.h"
@@ -95,9 +98,12 @@ void SelectCorrespondencesWidget::on_actionQuit_activated()
   exit(0);
 }
 
-// Constructor
-SelectCorrespondencesWidget::SelectCorrespondencesWidget() : LeftPane(NULL), RightPane(NULL), ProgressDialog(new QProgressDialog())
+void SelectCorrespondencesWidget::SharedConstructor()
 {
+  LeftPane = NULL;
+  RightPane = NULL;
+  ProgressDialog = new QProgressDialog;
+
   this->setupUi(this);
 
   connect(&this->FutureWatcher, SIGNAL(finished()), this->ProgressDialog , SLOT(cancel()));
@@ -105,7 +111,7 @@ SelectCorrespondencesWidget::SelectCorrespondencesWidget() : LeftPane(NULL), Rig
   // Setup icons
   QIcon openIcon = QIcon::fromTheme("document-open");
   QIcon saveIcon = QIcon::fromTheme("document-save");
-  
+
   // Setup left toolbar
   actionOpenImageLeft->setIcon(openIcon);
   this->toolBar_left->addAction(actionOpenImageLeft);
@@ -118,7 +124,7 @@ SelectCorrespondencesWidget::SelectCorrespondencesWidget() : LeftPane(NULL), Rig
 
   actionLoadPointsLeft->setIcon(openIcon);
   this->toolBar_left->addAction(actionLoadPointsLeft);
-  
+
   // Setup right toolbar
   actionOpenImageRight->setIcon(openIcon);
   this->toolBar_right->addAction(actionOpenImageRight);
@@ -131,10 +137,21 @@ SelectCorrespondencesWidget::SelectCorrespondencesWidget() : LeftPane(NULL), Rig
 
   actionLoadPointsRight->setIcon(openIcon);
   this->toolBar_right->addAction(actionLoadPointsRight);
+}
+
+SelectCorrespondencesWidget::SelectCorrespondencesWidget(const std::string& imageFileName, const std::string& pointCloudFileName)
+{
+  SharedConstructor();
+}
+
+// Constructor
+SelectCorrespondencesWidget::SelectCorrespondencesWidget()
+{
+  SharedConstructor();
 
 };
 
-void SelectCorrespondencesWidget::LoadPoints(Pane* const pane)
+void SelectCorrespondencesWidget::LoadPoints(Pane* const pane, const std::string& fileName)
 {
   // This function reads existing correspondences from a plain text file and displays them in the left pane.
 
@@ -143,24 +160,14 @@ void SelectCorrespondencesWidget::LoadPoints(Pane* const pane)
     std::cerr << "Cannot load points unless an image or point cloud is loaded!" << std::endl;
     return;
     }
-    
-  // Get a filename to open
-  QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Text Files (*.txt)");
-
-  std::cout << "Got filename: " << fileName.toStdString() << std::endl;
-  if(fileName.toStdString().empty())
-    {
-    std::cout << "Filename was empty." << std::endl;
-    return;
-    }
 
   if(dynamic_cast<Pane2D*>(pane))
     {
-    LoadPoints2D(dynamic_cast<Pane2D*>(pane), fileName.toStdString());
+    LoadPoints2D(dynamic_cast<Pane2D*>(pane), fileName);
     }
   else if(dynamic_cast<Pane3D*>(pane))
     {
-    LoadPoints3D(dynamic_cast<Pane3D*>(pane), fileName.toStdString());
+    LoadPoints3D(dynamic_cast<Pane3D*>(pane), fileName);
     }
 }
 
@@ -265,17 +272,9 @@ void SelectCorrespondencesWidget::SavePoints3D(Pane3D* const pane, const std::st
   fout.close();
 }
 
-void SelectCorrespondencesWidget::LoadImage(Pane* const inputPane)
+void SelectCorrespondencesWidget::LoadImage(Pane* const inputPane, const std::string& fileName)
 {
-    // Get a filename to open
-  QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Image Files (*.jpg *.jpeg *.bmp *.png *.mha)");
 
-  std::cout << "Got filename: " << fileName.toStdString() << std::endl;
-  if(fileName.toStdString().empty())
-    {
-    std::cout << "Filename was empty." << std::endl;
-    return;
-    }
 /*
   QFileInfo fileInfo(fileName.toStdString().c_str());
   std::string extension = fileInfo.suffix().toStdString();
@@ -285,7 +284,7 @@ void SelectCorrespondencesWidget::LoadImage(Pane* const inputPane)
 
   typedef itk::ImageFileReader<FloatVectorImageType> ReaderType;
   ReaderType::Pointer reader = ReaderType::New();
-  reader->SetFileName(fileName.toStdString());
+  reader->SetFileName(fileName);
   reader->Update();
 
   pane->Image = reader->GetOutput();
@@ -444,32 +443,71 @@ void SelectCorrespondencesWidget::LoadPointCloud(Pane* const inputPane)
 
 void SelectCorrespondencesWidget::on_actionLoadPointsLeft_activated()
 {
-  LoadPoints(this->LeftPane);
+  // Get a filename to open
+  QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Image Files (*.jpg *.jpeg *.bmp *.png *.mha)");
+
+  std::cout << "Got filename: " << fileName.toStdString() << std::endl;
+  if(fileName.toStdString().empty())
+    {
+    std::cout << "Filename was empty." << std::endl;
+    return;
+    }
+
+  LoadPoints(this->LeftPane, fileName.toStdString());
 }
 
 void SelectCorrespondencesWidget::on_actionLoadPointsRight_activated()
 {
-  LoadPoints(this->RightPane);
+  // Get a filename to open
+  QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Image Files (*.jpg *.jpeg *.bmp *.png *.mha)");
+
+  std::cout << "Got filename: " << fileName.toStdString() << std::endl;
+  if(fileName.toStdString().empty())
+    {
+    std::cout << "Filename was empty." << std::endl;
+    return;
+    }
+  LoadPoints(this->RightPane, fileName.toStdString());
 }
 
 void SelectCorrespondencesWidget::on_actionOpenImageLeft_activated()
 {
+  // Get a filename to open
+  QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Image Files (*.jpg *.jpeg *.bmp *.png *.mha)");
+
+  std::cout << "Got filename: " << fileName.toStdString() << std::endl;
+  if(fileName.toStdString().empty())
+    {
+    std::cout << "Filename was empty." << std::endl;
+    return;
+    }
+    
   if(this->LeftPane)
     {
     delete this->LeftPane;
     }
   this->LeftPane = new Pane2D(this->qvtkWidgetLeft);
-  LoadImage(this->LeftPane);
+  LoadImage(this->LeftPane, fileName.toStdString());
 }
 
 void SelectCorrespondencesWidget::on_actionOpenImageRight_activated()
 {
+  // Get a filename to open
+  QString fileName = QFileDialog::getOpenFileName(this, "Open File", ".", "Image Files (*.jpg *.jpeg *.bmp *.png *.mha)");
+
+  std::cout << "Got filename: " << fileName.toStdString() << std::endl;
+  if(fileName.toStdString().empty())
+    {
+    std::cout << "Filename was empty." << std::endl;
+    return;
+    }
+    
   if(this->RightPane)
     {
     delete this->RightPane;
     }
   this->RightPane = new Pane2D(this->qvtkWidgetRight);
-  LoadImage(this->RightPane);
+  LoadImage(this->RightPane, fileName.toStdString());
 }
 
 

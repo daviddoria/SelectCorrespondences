@@ -57,6 +57,8 @@ public:
 
   // Constructor/Destructor
   SelectCorrespondencesWidget();
+  SelectCorrespondencesWidget(const std::string& imageFileName, const std::string& pointCloudFileName);
+  
   ~SelectCorrespondencesWidget() {};
 
 public slots:
@@ -85,10 +87,12 @@ public slots:
   
 private:
 
+  void SharedConstructor();
+  
   QFutureWatcher<void> FutureWatcher;
   QProgressDialog* ProgressDialog;
 
-  void LoadPoints(Pane* const pane);
+  void LoadPoints(Pane* const pane, const std::string& fileName);
   void LoadPoints2D(Pane2D* const pane, const std::string& filename);
   void LoadPoints3D(Pane3D* const pane, const std::string& filename);
 
@@ -96,7 +100,7 @@ private:
   void SavePoints2D(Pane2D* const pane, const std::string& filename);
   void SavePoints3D(Pane3D* const pane, const std::string& filename);
   
-  void LoadImage(Pane* const pane);
+  void LoadImage(Pane* const pane, const std::string& fileName);
   void LoadPointCloud(Pane* const pane);
   
   Pane* LeftPane;

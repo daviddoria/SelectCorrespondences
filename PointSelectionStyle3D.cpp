@@ -22,6 +22,8 @@
 #include <vtkAbstractPicker.h>
 #include <vtkCamera.h>
 #include <vtkFollower.h>
+#include <vtkGlyph3D.h>
+#include <vtkLabeledDataMapper.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointPicker.h>
 #include <vtkPolyDataMapper.h>
@@ -35,6 +37,7 @@
 
 // STL
 #include <sstream>
+#include <stdexcept>
 
 // Custom
 #include "Helpers.h"
@@ -44,12 +47,25 @@ vtkStandardNewMacro(PointSelectionStyle3D);
 PointSelectionStyle3D::PointSelectionStyle3D()
 {
   this->MarkerRadius = .05;
-  
+
+  SelectedPoints = vtkSmartPointer<vtkPoints>::New();
+  SelectedPointsPolyData = vtkSmartPointer<vtkPolyData>::New();
+  SelectedPointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  SelectedPointsMapper->SetInputConnection(SelectedPointsPolyData->GetProducerPort());
+
   // Create a sphere to use as the dot
   this->DotSource = vtkSmartPointer<vtkSphereSource>::New();
   this->DotSource->SetRadius(this->MarkerRadius);
   this->DotSource->Update();
+
+  Glyph3D = vtkSmartPointer<vtkGlyph3D>::New();
+  Glyph3D->SetSource(DotSource->GetOutput());
+  Glyph3D->SetInput(SelectedPointsPolyData);
+
+  // Create the text numbers
+  LabeledDataMapper = vtkSmartPointer<vtkLabeledDataMapper>::New();
   
+
 }
 
 void PointSelectionStyle3D::OnLeftButtonDown() 
@@ -119,6 +135,8 @@ void PointSelectionStyle3D::AddNumber(double p[3])
   coord.y = p[1];
   coord.z = p[2];
   Coordinates.push_back(coord);
+
+  SelectedPoints->InsertNextPoint(p);
   
   vtkSmartPointer<vtkVectorText> textSource = vtkSmartPointer<vtkVectorText>::New();
   textSource->SetText( ss.str().c_str() );
@@ -127,30 +145,38 @@ void PointSelectionStyle3D::AddNumber(double p[3])
   vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   mapper->SetInputConnection( textSource->GetOutputPort() );
 
+  vtkSmartPointer<vtkLabeledDataMapper> labelMapper =
+    vtkSmartPointer<vtkLabeledDataMapper>::New();
+  labelMapper->SetInputConnection(pointSource->GetOutputPort());
+  vtkSmartPointer<vtkActor2D> labelActor =
+    vtkSmartPointer<vtkActor2D>::New();
+  labelActor->SetMapper(labelMapper);
+  
   // Create a subclass of vtkActor: a vtkFollower that remains facing the camera
-  vtkSmartPointer<vtkFollower> follower = vtkSmartPointer<vtkFollower>::New();
-  follower->SetMapper( mapper );
-  follower->SetCamera(this->CurrentRenderer->GetActiveCamera());
-  follower->SetPosition(p);
-  follower->GetProperty()->SetColor( 1, 0, 0 ); // red
-  follower->SetScale( .1, .1, .1 );
-
-  this->Numbers.push_back(follower);
-  this->CurrentRenderer->AddViewProp( follower );
+//   vtkSmartPointer<vtkFollower> follower = vtkSmartPointer<vtkFollower>::New();
+//   follower->SetMapper( mapper );
+//   follower->SetCamera(this->CurrentRenderer->GetActiveCamera());
+//   follower->SetPosition(p);
+//   follower->GetProperty()->SetColor( 1, 0, 0 ); // red
+//   follower->SetScale( .1, .1, .1 );
+// 
+//   this->Numbers.push_back(follower);
+  // this->CurrentRenderer->AddViewProp( follower );
   
   // Create the dot
-
+  this->CurrentRenderer->AddViewProp(Glyph3D);
+  
   // Create a mapper
   vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   sphereMapper->SetInputConnection( this->DotSource->GetOutputPort() );
 
   // Create a subclass of vtkActor: a vtkFollower that remains facing the camera
-  vtkSmartPointer<vtkActor> sphereActor = vtkSmartPointer<vtkActor>::New();
-  sphereActor->SetMapper( sphereMapper );
-  sphereActor->SetPosition(p);
-  sphereActor->GetProperty()->SetColor( 1, 0, 0 ); // red
+//   vtkSmartPointer<vtkActor> sphereActor = vtkSmartPointer<vtkActor>::New();
+//   sphereActor->SetMapper( sphereMapper );
+//   sphereActor->SetPosition(p);
+//   sphereActor->GetProperty()->SetColor( 1, 0, 0 ); // red
 
-  this->Points.push_back(sphereActor);
+  // this->Points.push_back(sphereActor);
   this->CurrentRenderer->AddViewProp( sphereActor );
 }
 
